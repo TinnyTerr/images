@@ -1,6 +1,6 @@
 export const schema = `
 CREATE TABLE IF NOT EXISTS files (
-  id INTEGER PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
   path TEXT UNIQUE,
   size INTEGER,
   mtime INTEGER,
