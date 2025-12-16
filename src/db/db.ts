@@ -2,8 +2,8 @@ import { Database } from "bun:sqlite";
 import { schema } from "./schema";
 
 export const db = new Database("index.db", {
-  create: true,
-  strict: true,
+	create: true,
+	strict: true,
 });
 
 db.run(`
