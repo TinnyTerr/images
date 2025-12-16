@@ -5,6 +5,13 @@ import { scanDir } from "./indexer/scan";
 type Row = { id: number; path: string };
 
 function list(args: string[]) {
+	const page = args.shift() ?? "1";
+	const pageNum = Number(page);
+	if (Number.isNaN(pageNum) || pageNum < 1) {
+		console.error("Invalid page number");
+		return;
+	}
+
 	let sql = `
 		SELECT DISTINCT files.id, files.path
 		FROM files
@@ -26,9 +33,9 @@ function list(args: string[]) {
 		}
 	}
 
-	sql += " ORDER BY files.path LIMIT 100";
+	sql += " ORDER BY files.id ASC LIMIT 50 OFFSET ?";
 
-	const rows = db.query(sql).all(...params) as Row[];
+	const rows = db.query(sql).all(...params, (pageNum - 1) * 50) as Row[];
 
 	for (const r of rows) {
 		console.log(`${r.id}\t${r.path}`);
@@ -44,8 +51,9 @@ function usage() {
 	console.log(`
 Usage:
   index <dir>         Index directory
-  list [tags...]   List files
+  list [page] [tags...]   List files
   tag <id> <tags...>  Add tags
+  reset               Reset database
 `);
 }
 
@@ -70,6 +78,14 @@ switch (cmd) {
 			break;
 		}
 		tag(Number(args[0]), args.slice(1));
+		break;
+	case "reset":
+		db.run("DELETE FROM files");
+		db.run("DELETE FROM tags");
+		db.run("DELETE FROM file_tags");
+		db.run("DELETE FROM ratings");
+		db.run("DELETE FROM analytics");
+		console.log("Database reset.");
 		break;
 
 	default:
