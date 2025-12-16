@@ -1,7 +1,12 @@
 import { Database } from "bun:sqlite";
 import { schema } from "./schema";
+import path from "node:path"
 
-export const db = new Database("index.db", {
+const DB_PATH = process.env.IMAGER_DB
+  ? path.resolve(process.env.IMAGER_DB)
+  : path.resolve(import.meta.dir, "../index.db");
+
+export const db = new Database(DB_PATH, {
 	create: true,
 	strict: true,
 });
